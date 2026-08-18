@@ -10,8 +10,10 @@ An enterprise-grade functional and technical specification suite for migrating l
 SAP-SuccessFactors-EC-Migration-Toolkit/
 │
 ├── 01-EC-Configuration-Specs/           # Core Functional & Technical Specifications (TDDs)
-│   └── 01-Foundation-and-Org-Structures/
-│       └── 1.1-FO-MDF-Corporate-Structure-Design.md
+│   ├── 01-Foundation-and-Org-Structures/
+│   │   └── 1.1-FO-MDF-Corporate-Structure-Design.md
+│   └── 02-HRIS-Elements-and-BCUI/
+│       └── 1.2-HRIS-Element-Customization-Blueprint.md
 │
 ├── 02-Data-Mapping-Peoplesoft-to-EC/     # Field Mapping Matrices & $batch OData Payloads (In Progress)
 │
