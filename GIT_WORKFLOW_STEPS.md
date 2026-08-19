@@ -1,0 +1,36 @@
+Target Repository: [https://github.com/paithankarvaibhav19-sys/SAP-SuccessFactors-EC-Migration-Toolkit](https://github.com/paithankarvaibhav19-sys/SAP-SuccessFactors-EC-Migration-Toolkit)
+
+1. Files Created and Code Written
+File 1: Specification Document
+File Path: 01-EC-Configuration-Specs/01-Foundation-and-Org-Structures/1.1-FO-MDF-Corporate-Structure-Design.md
+
+Purpose: Technical Design Document for Corporate Hierarchy, MDF vs. Classic FO, and Valid-When rules.# Technical Design Document: Corporate Structure & Foundation Object Design
+
+**Project Name:** GlobalTech Solutions - Legacy HRMS to SAP EC Migration  
+**Document ID:** TDD-EC-001  
+**Module:** Employee Central (Core)  
+**Author:** User Success Engineer / SAP EC Migration Specialist  
+**Status:** Baseline Specification  
+
+---
+
+## 1. Business Objective & Scenario
+
+GlobalTech Solutions is migrating from a legacy HRMS to SAP SuccessFactors Employee Central. This specification establishes the organizational data model, segregates Generic Objects (MDF) from Classic Foundation Objects (FO), and defines field-level cascading association rules to prevent invalid organizational data entry across global offices.
+
+---
+
+## 2. Organizational Hierarchy Architecture
+
+The corporate structure enforces a strict 4-tier hierarchy. Lower-level objects inherit access and filtering context from their immediate parent entity.
+
+```text
+[ Legal Entity (GT_US / GT_IN) ]
+       │
+       └── [ Business Unit (BU_ENT / BU_CLOUD) ]
+                │
+                └── [ Division (DIV_HCM / DIV_INFRA) ]
+                         │
+                         └── [ Department (DEP_L2_SUPP / DEP_ENG) ]
+
+                         
