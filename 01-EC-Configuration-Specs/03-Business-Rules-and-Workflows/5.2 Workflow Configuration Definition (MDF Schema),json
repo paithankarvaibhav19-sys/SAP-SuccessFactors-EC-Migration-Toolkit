@@ -1,0 +1,22 @@
+{
+  "workflowId": "WF_PROMOTION_APPROVAL",
+  "workflowName": "GlobalTech Promotion & Compensation Workflow",
+  "description": "Standard multi-step approval routing for cross-grade promotions",
+  "steps": [
+    {
+      "stepNum": 1,
+      "approverType": "Role",
+      "approverRole": "E_MANAGER",
+      "actionType": "Approve/Reject",
+      "escalationDays": 3
+    },
+    {
+      "stepNum": 2,
+      "approverType": "Dynamic Group",
+      "approverGroup": "GT_HRBP_INDIA",
+      "actionType": "Approve/Reject",
+      "escalationDays": 5
+    }
+  ],
+  "ccRole": "EMPLOYEE"
+}
