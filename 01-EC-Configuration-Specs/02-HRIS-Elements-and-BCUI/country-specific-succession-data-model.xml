@@ -1,0 +1,16 @@
+<country-specific-succession-data-model>
+  <!-- India (IND) Localized National ID Specifications -->
+  <country id="IND">
+    <hris-element id="nationalIdCard">
+      <hris-field id="national-id" max-length="32" visibility="both" required="true">
+        <label>Identity Number</label>
+      </hris-field>
+      <hris-field id="card-type" max-length="32" visibility="both" required="true">
+        <label>Card Type (PAN / Aadhaar / Passport)</label>
+      </hris-field>
+      <hris-field id="is-primary" max-length="1" visibility="both" required="true">
+        <label>Primary ID</label>
+      </hris-field>
+    </hris-element>
+  </country>
+</country-specific-succession-data-model>
