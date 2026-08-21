@@ -1,0 +1,45 @@
+POST /odata/v2/$batch HTTP/1.1
+Host: api.successfactors.eu
+Content-Type: multipart/mixed; boundary=batch_boundary_01
+Authorization: Bearer {{bearerToken}}
+
+--batch_boundary_01
+Content-Type: multipart/mixed; boundary=changeset_boundary_01
+
+--changeset_boundary_01
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+POST EmpJob HTTP/1.1
+Content-Type: application/json
+
+{
+  "__metadata": { "uri": "EmpJob" },
+  "userId": "100452",
+  "startDate": "/Date(1717200000000)/",
+  "event": "PROM",
+  "eventReason": "PROM_SAL",
+  "businessUnit": "BU_ENT",
+  "department": "DEP_L2_SUPP",
+  "location": "LOC_PUNE",
+  "managerId": "100102"
+}
+
+--changeset_boundary_01
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+POST PerNationalId HTTP/1.1
+Content-Type: application/json
+
+{
+  "__metadata": { "uri": "PerNationalId" },
+  "personIdExternal": "100452",
+  "country": "IND",
+  "cardType": "PAN",
+  "nationalId": "ABCDE1234F",
+  "isPrimary": true
+}
+
+--changeset_boundary_01--
+--batch_boundary_01--
