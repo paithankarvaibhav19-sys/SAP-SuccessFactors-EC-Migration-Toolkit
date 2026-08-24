@@ -45,9 +45,16 @@ This repository houses enterprise-grade technical design documents (TDDs), confi
   * Multipart `$batch` ChangeSets for atomic, rollback-safe multi-entity ingestion (`PerPerson`, `EmpEmployment`, `EmpJob`).
   * Executable test requests suite defined in [sf-odata-batch-requests.http](./01-EC-Configuration-Specs/04-CPI-Integrations-and-OData/sf-odata-batch-requests.http).
 
-
 ---
 
+* [1.4 Position Management Architecture & Pos2Job Synchronization Blueprint](./01-EC-Configuration-Specs/05-Position-Management/1.4-Position-Management-and-Sync-Rules.md)
+  * Establishes the MDF Position object data model, associations, and matrix reporting structures.
+  * Implements `Pos2Job` attribute inheritance and reporting hierarchy derivation via the `Job Information Model`.
+  * Configures vacancy enforcement validations on `onSave` to block over-allocation on single-incumbent positions.
+  * Provides operational troubleshooting runbooks for orphan incumbents and hierarchy gaps.
+
+
+---
 ## 🛠️ Technology & Platform Coverage
 * **SAP SuccessFactors:** Employee Central (Core/MDF/BCUI), Succession Data Model (SDM), Corporate Data Model (CDM), Country-Specific Models (CSF), Picklist Center, Role-Based Permissions (RBP), Business Rules Engine.
 * **SAP Integration & Middleware:** SAP Cloud Integration (CPI / BTP Integration Suite), Groovy Scripting, OData v2 `$batch` multipart changeSets.
