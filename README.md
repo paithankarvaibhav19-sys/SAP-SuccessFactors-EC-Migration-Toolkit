@@ -39,6 +39,15 @@ This repository houses enterprise-grade technical design documents (TDDs), confi
 
 ---
 
+* [4.1 CPI iFlow Architecture & OData v2 Batch Ingestion Specification](./01-EC-Configuration-Specs/04-CPI-Integrations-and-OData/4.1-CPI-iFlow-and-OData-Batch-Specs.md)
+  * End-to-end integration architecture for high-volume legacy workforce migration via SAP Cloud Integration (CPI/BTP).
+  * Groovy 3.0 transformation script for ISO-to-Epoch timestamp standardization (`/Date(epoch)/`).
+  * Multipart `$batch` ChangeSets for atomic, rollback-safe multi-entity ingestion (`PerPerson`, `EmpEmployment`, `EmpJob`).
+  * Executable test requests suite defined in [sf-odata-batch-requests.http](./01-EC-Configuration-Specs/04-CPI-Integrations-and-OData/sf-odata-batch-requests.http).
+
+
+---
+
 ## 🛠️ Technology & Platform Coverage
 * **SAP SuccessFactors:** Employee Central (Core/MDF/BCUI), Succession Data Model (SDM), Corporate Data Model (CDM), Country-Specific Models (CSF), Picklist Center, Role-Based Permissions (RBP), Business Rules Engine.
 * **SAP Integration & Middleware:** SAP Cloud Integration (CPI / BTP Integration Suite), Groovy Scripting, OData v2 `$batch` multipart changeSets.

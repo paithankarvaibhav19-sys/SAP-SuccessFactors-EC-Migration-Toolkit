@@ -1,45 +1,100 @@
-POST /odata/v2/$batch HTTP/1.1
-Host: api.successfactors.eu
-Content-Type: multipart/mixed; boundary=batch_boundary_01
-Authorization: Bearer {{bearerToken}}
+### ==============================================================================
+### SAP SuccessFactors Employee Central OData v2 Batch Ingestion Suite
+### Module: 04-CPI-Integrations-and-OData
+### Author: VPR11 | Vaibhav Paithankar
+### Description: Atomic Multipart $batch Execution (PerPerson, EmpEmployment, EmpJob)
+### ==============================================================================
 
---batch_boundary_01
-Content-Type: multipart/mixed; boundary=changeset_boundary_01
+@baseUrl = https://apisalesdemo4.successfactors.com/odata/v2
+@apiUser = SF_CPI_INTEGRATION@CompanyProd
+@apiPassword = {{SF_API_PASSWORD}}
+@boundary = batch_sf_migration_boundary_001
+@changesetBoundary = changeset_worker_e1001
 
---changeset_boundary_01
+### ------------------------------------------------------------------------------
+### 1. Pre-Flight Health Check: Query API Metadata
+### ------------------------------------------------------------------------------
+# @name getMetadata
+GET {{baseUrl}}/$metadata
+Authorization: Basic {{apiUser}}:{{apiPassword}}
+Accept: application/xml
+
+### ------------------------------------------------------------------------------
+### 2. Query Existing Legacy Worker Mapping Delta
+### ------------------------------------------------------------------------------
+# @name queryEmpJobDelta
+GET {{baseUrl}}/EmpJob?$top=5&$select=userId,startDate,department,businessUnit,customString1,customString2&$filter=customString1 eq 'OU_PUNE_TECH'
+Authorization: Basic {{apiUser}}:{{apiPassword}}
+Accept: application/json
+
+### ------------------------------------------------------------------------------
+### 3. Multipart OData v2 $batch Ingestion (Atomic ChangeSet)
+### ------------------------------------------------------------------------------
+# @name executeBatchWorkerLoad
+POST {{baseUrl}}/$batch
+Authorization: Basic {{apiUser}}:{{apiPassword}}
+Content-Type: multipart/mixed; boundary={{boundary}}
+
+--{{boundary}}
+Content-Type: multipart/mixed; boundary={{changesetBoundary}}
+
+--{{changesetBoundary}}
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+POST PerPerson HTTP/1.1
+Content-Type: application/json; charset=utf-8
+Accept: application/json
+
+{
+  "personIdExternal": "EMP_GLOBAL_1001",
+  "userId": "EMP_GLOBAL_1001",
+  "perPerson": {
+    "customString1": "MIGRATION_SOURCE_PEOPLESOFT"
+  }
+}
+
+--{{changesetBoundary}}
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+POST EmpEmployment HTTP/1.1
+Content-Type: application/json; charset=utf-8
+Accept: application/json
+
+{
+  "personIdExternal": "EMP_GLOBAL_1001",
+  "userId": "EMP_GLOBAL_1001",
+  "startDate": "/Date(1787562000000+0000)/",
+  "isContingentWorker": false,
+  "originalStartDate": "/Date(1787562000000+0000)/"
+}
+
+--{{changesetBoundary}}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
 
 POST EmpJob HTTP/1.1
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
+Accept: application/json
 
 {
-  "__metadata": { "uri": "EmpJob" },
-  "userId": "100452",
-  "startDate": "/Date(1717200000000)/",
-  "event": "PROM",
-  "eventReason": "PROM_SAL",
-  "businessUnit": "BU_ENT",
-  "department": "DEP_L2_SUPP",
-  "location": "LOC_PUNE",
-  "managerId": "100102"
+  "userId": "EMP_GLOBAL_1001",
+  "startDate": "/Date(1787562000000+0000)/",
+  "seqNumber": "1",
+  "eventReason": "HIRNEW",
+  "businessUnit": "TECH_CORP",
+  "department": "ENG_SUPPORT_L2",
+  "location": "LOC_PUN_01",
+  "customString1": "OU_PUNE_TECH",
+  "customString3": "ROLE_SUPPORT_ENG",
+  "customString4": "FUNC_TECH_OPS",
+  "customString5": "DOM_INFRA_SUPPORT",
+  "customString6": false,
+  "standardHours": 40.0,
+  "payGrade": "GRADE_L2_IN"
 }
 
---changeset_boundary_01
-Content-Type: application/http
-Content-Transfer-Encoding: binary
+--{{changesetBoundary}}--
 
-POST PerNationalId HTTP/1.1
-Content-Type: application/json
-
-{
-  "__metadata": { "uri": "PerNationalId" },
-  "personIdExternal": "100452",
-  "country": "IND",
-  "cardType": "PAN",
-  "nationalId": "ABCDE1234F",
-  "isPrimary": true
-}
-
---changeset_boundary_01--
---batch_boundary_01--
+--{{boundary}}--
