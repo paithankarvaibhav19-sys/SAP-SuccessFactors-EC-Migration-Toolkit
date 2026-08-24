@@ -11,25 +11,56 @@
 @boundary = batch_sf_migration_boundary_001
 @changesetBoundary = changeset_worker_e1001
 
+### ==============================================================================
+### SECTION 1: PRE-FLIGHT HEALTH CHECK (Get Metadata)
 ### ------------------------------------------------------------------------------
-### 1. Pre-Flight Health Check: Query API Metadata
-### ------------------------------------------------------------------------------
+### REAL-LIFE FOOD APP ANALOGY:
+### Before placing an order on Swiggy/Zomato, you open the restaurant's live menu 
+### to see which dishes, toppings, and sizes are currently available to order.
+### 
+### In SAP terms, $metadata downloads the exact list of active entities, field types, 
+### and required attributes configured in the Employee Central tenant.
+### ==============================================================================
 # @name getMetadata
 GET {{baseUrl}}/$metadata
 Authorization: Basic {{apiUser}}:{{apiPassword}}
 Accept: application/xml
 
+
+### ==============================================================================
+### SECTION 2: DELTA CHECK / QUERY EXISTING DATA
 ### ------------------------------------------------------------------------------
-### 2. Query Existing Legacy Worker Mapping Delta
-### ------------------------------------------------------------------------------
+### REAL-LIFE FOOD APP ANALOGY:
+### Checking your "Recent Orders" tab before hitting reorder, ensuring you don't 
+### accidentally place a duplicate order for the same meal twice.
+### 
+### Here, we query active records in a department to verify connectivity and confirm 
+### whether this employee already exists before creating a new profile.
+### ==============================================================================
 # @name queryEmpJobDelta
 GET {{baseUrl}}/EmpJob?$top=5&$select=userId,startDate,department,businessUnit,customString1,customString2&$filter=customString1 eq 'OU_PUNE_TECH'
 Authorization: Basic {{apiUser}}:{{apiPassword}}
 Accept: application/json
 
+
+### ==============================================================================
+### SECTION 3: MULTIPART $BATCH INGESTION (THE SEALED DELIVERY BAG)
 ### ------------------------------------------------------------------------------
-### 3. Multipart OData v2 $batch Ingestion (Atomic ChangeSet)
-### ------------------------------------------------------------------------------
+### REAL-LIFE FOOD APP ANALOGY:
+### You order a 3-course meal: 
+###   1. Starter (PerPerson)
+###   2. Main Course (EmpEmployment)
+###   3. Side & Dessert (EmpJob)
+### 
+### The restaurant places all 3 boxes inside ONE sealed delivery bag (The ChangeSet).
+### 
+### When the delivery rider arrives at your doorstep:
+### - If all 3 items are correct, you accept the entire bag.
+### - If the restaurant forgot the main course or brought the wrong dish, you REJECT 
+###   the entire bag at once. You don't keep just the starter while missing the meal.
+### 
+### In database terms, this is ATOMICITY: all 3 tables update together, or none do.
+### ==============================================================================
 # @name executeBatchWorkerLoad
 POST {{baseUrl}}/$batch
 Authorization: Basic {{apiUser}}:{{apiPassword}}
@@ -38,6 +69,11 @@ Content-Type: multipart/mixed; boundary={{boundary}}
 --{{boundary}}
 Content-Type: multipart/mixed; boundary={{changesetBoundary}}
 
+### ------------------------------------------------------------------------------
+### ITEM 1: THE STARTER / APPETIZER (PerPerson API)
+### Food Analogy: Setting the foundation of the meal (Who ordered the food).
+### SAP Meaning: Creates the fundamental human being record in the global database.
+### ------------------------------------------------------------------------------
 --{{changesetBoundary}}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
@@ -54,6 +90,12 @@ Accept: application/json
   }
 }
 
+### ------------------------------------------------------------------------------
+### ITEM 2: THE MAIN COURSE (EmpEmployment API)
+### Food Analogy: The core meal item containing the order timestamp.
+### SAP Meaning: Creates the employment contract timeline with the start date.
+### Note: Date is in Epoch format (/Date(...)/) converted by our CPI Groovy script.
+### ------------------------------------------------------------------------------
 --{{changesetBoundary}}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
@@ -70,6 +112,11 @@ Accept: application/json
   "originalStartDate": "/Date(1787562000000+0000)/"
 }
 
+### ------------------------------------------------------------------------------
+### ITEM 3: SIDES, DRINK & DESSERT (EmpJob API)
+### Food Analogy: Specifying the custom toppings, drink flavor, and table seat.
+### SAP Meaning: Assigns the department, business unit, location, manager, and pay grade.
+### ------------------------------------------------------------------------------
 --{{changesetBoundary}}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
@@ -95,6 +142,12 @@ Accept: application/json
   "payGrade": "GRADE_L2_IN"
 }
 
+### ------------------------------------------------------------------------------
+### SEAL THE DELIVERY BAG (ChangeSet boundary closes here)
+### ------------------------------------------------------------------------------
 --{{changesetBoundary}}--
 
+### ------------------------------------------------------------------------------
+### CLOSE THE ENTIRE HTTP BATCH PAYLOAD
+### ------------------------------------------------------------------------------
 --{{boundary}}--
